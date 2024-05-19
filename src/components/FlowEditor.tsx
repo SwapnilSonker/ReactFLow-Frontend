@@ -1,4 +1,3 @@
-
 import React, { useCallback, useState } from 'react';
 import ReactFlow, {
   ReactFlowProvider,
@@ -28,7 +27,6 @@ const FlowEditorContent: React.FC = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentNodeId, setCurrentNodeId] = useState<string | null>(null);
 
   const onNodesDelete = useCallback(
     (nodesToRemove: Node[]) => {
@@ -44,7 +42,10 @@ const FlowEditorContent: React.FC = () => {
     [setEdges]
   );
 
-  const onConnect = (params: Edge | Connection) => setEdges((eds) => addEdge(params, eds));
+  const onConnect = useCallback(
+    (params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)),
+    [setEdges]
+  );
 
   const addNode = (type: string, data: { email: string; subject: string; body: string }) => {
     const id = uuidv4();
@@ -57,20 +58,18 @@ const FlowEditorContent: React.FC = () => {
     setNodes((nds) => nds.concat(newNode));
   };
 
-  const handleAddNode = (nodeId: string) => {
-    setCurrentNodeId(nodeId);
+  const handleAddNode = () => {
     setIsModalOpen(true);
   };
 
   const handleSave = (type: string, data: { email: string; subject: string; body: string }) => {
     addNode(type, data);
     setIsModalOpen(false);
-    setCurrentNodeId(null);
   };
 
   // Update the initial "Start" node to include the handleAddNode function
   if (nodes.length > 0 && nodes[0].id === '1') {
-    nodes[0].data.onAddNode = () => handleAddNode('1');
+    nodes[0].data.onAddNode = handleAddNode;
   }
 
   return (
@@ -88,8 +87,8 @@ const FlowEditorContent: React.FC = () => {
         onNodesDelete={onNodesDelete}
         onEdgesDelete={onEdgesDelete}
         onConnect={onConnect}
-        deleteKeyCode={"46"} 
-        nodeTypes={nodeTypes} 
+        deleteKeyCode={"46"} // Use delete key
+        nodeTypes={nodeTypes}
       >
         <Controls />
         <Background />

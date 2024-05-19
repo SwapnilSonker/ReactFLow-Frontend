@@ -1,4 +1,4 @@
-
+// src/components/NodeModal.tsx
 import React, { useState } from 'react';
 import './NodeModal.css'; 
 
@@ -13,10 +13,17 @@ const NodeModal: React.FC<NodeModalProps> = ({ isOpen, onClose, onSave }) => {
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   const handleSave = async () => {
     if (nodeType === 'Cold Email') {
+      
+      if (!email || !subject || !body) {
+        setError('All fields are required.');
+        return;
+      }
+
       const response = await fetch('https://reactflow-backend-nnav.onrender.com/schedule-email', {
         method: 'POST',
         headers: {
@@ -32,6 +39,7 @@ const NodeModal: React.FC<NodeModalProps> = ({ isOpen, onClose, onSave }) => {
           setEmail(''); 
           setSubject(''); 
           setBody(''); 
+          setError(null); 
           setMessage(null); 
           onClose();
         }, 2000); 
@@ -39,10 +47,15 @@ const NodeModal: React.FC<NodeModalProps> = ({ isOpen, onClose, onSave }) => {
         console.error('Failed to send email');
       }
     } else {
+      if (!email || !subject || !body) {
+        setError('All fields are required.');
+        return;
+      }
       onSave(nodeType, { email, subject, body });
       setEmail(''); 
-      setSubject('');
+      setSubject(''); 
       setBody(''); 
+      setError(null); 
       onClose();
     }
   };
@@ -55,6 +68,7 @@ const NodeModal: React.FC<NodeModalProps> = ({ isOpen, onClose, onSave }) => {
         <span className="close" onClick={onClose}>&times;</span>
         <h2>Add Node</h2>
         {message && <p className="confirmation-message">{message}</p>}
+        {error && <p className="error-message">{error}</p>}
         <label>
           Type:
           <select value={nodeType} onChange={(e) => setNodeType(e.target.value)}>
