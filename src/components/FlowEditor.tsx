@@ -1,5 +1,5 @@
 // src/components/FlowEditor.tsx
-import React, { useState } from 'react';
+import React, { useCallback } from 'react';
 import ReactFlow, {
   ReactFlowProvider,
   addEdge,
@@ -10,22 +10,38 @@ import ReactFlow, {
   Connection,
   Edge,
   Node,
-  Elements,
+  NodeTypes,
 } from 'react-flow-renderer';
 import { v4 as uuidv4 } from 'uuid';
+import  {CustomNode}  from './Customnode.tsx';
+
+ // Import the custom node
 
 const initialNodes: Node[] = [
   { id: '1', type: 'input', data: { label: 'Start' }, position: { x: 250, y: 0 } },
 ];
 
-const FlowEditor: React.FC = () => {
+const nodeTypes: NodeTypes = {
+  custom: CustomNode, // Register the custom node
+};
+
+const FlowEditorContent: React.FC = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  const onElementsRemove = (elementsToRemove: Elements) => {
-    setNodes((nds) => nds.filter((node) => !elementsToRemove.some((el: { id: any; }) => el.id === node.id)));
-    setEdges((eds) => eds.filter((edge) => !elementsToRemove.some((el: { id: any; }) => el.id === edge.id)));
-  };
+  const onNodesDelete = useCallback(
+    (nodesToRemove: Node[]) => {
+      setNodes((nds) => nds.filter((node) => !nodesToRemove.some((el) => el.id === node.id)));
+    },
+    [setNodes]
+  );
+
+  const onEdgesDelete = useCallback(
+    (edgesToRemove: Edge[]) => {
+      setEdges((eds) => eds.filter((edge) => !edgesToRemove.some((el) => el.id === edge.id)));
+    },
+    [setEdges]
+  );
 
   const onConnect = (params: Edge | Connection) => setEdges((eds) => addEdge(params, eds));
 
@@ -35,7 +51,7 @@ const FlowEditor: React.FC = () => {
       id,
       data: { label: `${type} Node` },
       position: { x: Math.random() * 250, y: Math.random() * 250 },
-      type: 'default',
+      type: type === 'Cold Email' ? 'custom' : 'default', // Use custom node type for Cold Email
     };
     setNodes((nds) => nds.concat(newNode));
   };
@@ -47,21 +63,29 @@ const FlowEditor: React.FC = () => {
         <button onClick={() => addNode('Wait/Delay')}>Add Wait/Delay</button>
         <button onClick={() => addNode('Lead Source')}>Add Lead Source</button>
       </div>
-      <ReactFlowProvider>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onElementsRemove={onElementsRemove}
-          onConnect={onConnect}
-          deleteKeyCode={46 || null} // 'delete' key
-        >
-          <Controls />
-          <Background />
-        </ReactFlow>
-      </ReactFlowProvider>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onNodesDelete={onNodesDelete}
+        onEdgesDelete={onEdgesDelete}
+        onConnect={onConnect}
+        deleteKeyCode={"46"} // 'delete' key
+        nodeTypes={nodeTypes} // Set the node types
+      >
+        <Controls />
+        <Background />
+      </ReactFlow>
     </div>
+  );
+};
+
+const FlowEditor: React.FC = () => {
+  return (
+    <ReactFlowProvider>
+      <FlowEditorContent />
+    </ReactFlowProvider>
   );
 };
 
