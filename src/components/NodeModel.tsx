@@ -1,4 +1,4 @@
-// src/components/NodeModal.tsx
+
 import React, { useState } from 'react';
 import './NodeModal.css'; 
 
@@ -18,9 +18,9 @@ const NodeModal: React.FC<NodeModalProps> = ({ isOpen, onClose, onSave }) => {
 
   const handleSave = async () => {
     if (nodeType === 'Cold Email') {
-      
+      // Validation checks for Cold Email type
       if (!email || !subject || !body) {
-        setError('All fields are required.');
+        setError('All fields are required for Cold Email.');
         return;
       }
 
@@ -33,29 +33,22 @@ const NodeModal: React.FC<NodeModalProps> = ({ isOpen, onClose, onSave }) => {
       });
 
       if (response.ok) {
-        setMessage('Email scheduled successfully');
+        setMessage('Email scheduled successfully.');
         setTimeout(() => {
           onSave(nodeType, { email, subject, body });
-          setEmail(''); 
-          setSubject(''); 
-          setBody(''); 
-          setError(null); 
-          setMessage(null); 
+          setEmail(''); // Reset email
+          setSubject(''); // Reset subject
+          setBody(''); // Reset body
+          setError(null); // Reset error
+          setMessage(null); // Reset message
           onClose();
-        }, 2000); 
+        }, 2000); // Show message for 2 seconds before closing
       } else {
         console.error('Failed to send email');
       }
     } else {
-      if (!email || !subject || !body) {
-        setError('All fields are required.');
-        return;
-      }
-      onSave(nodeType, { email, subject, body });
-      setEmail(''); 
-      setSubject(''); 
-      setBody(''); 
-      setError(null); 
+      // For other node types, no specific validation required
+      onSave(nodeType, { email: '', subject: '', body: '' });
       onClose();
     }
   };
