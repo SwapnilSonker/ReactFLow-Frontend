@@ -1,4 +1,4 @@
-// src/components/CustomNode.tsx
+
 import { Handle, Position } from 'react-flow-renderer';
 
 const CustomNode = ({ data }: any) => {

@@ -1,6 +1,6 @@
-// src/components/NodeModal.tsx
+
 import React, { useState } from 'react';
-import './NodeModal.css'; // Ensure to create and import the CSS file for styling
+import './NodeModal.css'; 
 
 interface NodeModalProps {
   isOpen: boolean;

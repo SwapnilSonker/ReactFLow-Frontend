@@ -1,4 +1,4 @@
-// src/components/FlowEditor.tsx
+
 import React, { useCallback, useState } from 'react';
 import ReactFlow, {
   ReactFlowProvider,
@@ -88,8 +88,8 @@ const FlowEditorContent: React.FC = () => {
         onNodesDelete={onNodesDelete}
         onEdgesDelete={onEdgesDelete}
         onConnect={onConnect}
-        deleteKeyCode={"46"} // 'delete' key
-        nodeTypes={nodeTypes} // Set the node types
+        deleteKeyCode={"46"} 
+        nodeTypes={nodeTypes} 
       >
         <Controls />
         <Background />
